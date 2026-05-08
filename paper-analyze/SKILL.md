@@ -807,6 +807,16 @@ tags:
 - 图片引用 → `<img>` 标签（使用相对路径 `images/xxx.png`）
 - 公式 → KaTeX 渲染（`$...$` → `<span class="katex">`, `$$...$$` → `<div class="katex-display">`）
 
+### 3.5 公式特殊字符转义（重要）
+公式中的某些符号与 HTML 语法冲突，必须转义：
+- `<` → `\lt`（否则被解析为 HTML 标签开始）
+- `>` → `\gt`（否则被解析为 HTML 标签结束）
+- `&` → `&amp;`（否则被解析为 HTML 实体开始）
+- `\left<` → `\left\langle`，`\right>` → `\right\rangle`
+- `\leq`、`\geq` 等 LaTeX 命令本身安全，不需要处理
+
+扫描所有 `$...$` 和 `$$...$$` 中的文本，执行上述替换。
+
 ### 4. 生成完整 HTML 文件
 将转换后的内容填充到模板骨架中，保存到 `${paper_dir}/${safe_title}-slides.html`。
 
@@ -863,6 +873,16 @@ tags:
 - 公式 → KaTeX 自动渲染（`$...$` 和 `$$...$$`）
 - 代码块 → `<pre><code>` + highlight.js
 - `[[glossary#概念名|概念名]]` → `<span class="glossary-term" data-term="概念名">概念名</span>`
+
+### 3.5 公式特殊字符转义（重要）
+公式中的某些符号与 HTML 语法冲突，必须转义：
+- `<` → `\lt`（否则被解析为 HTML 标签开始）
+- `>` → `\gt`（否则被解析为 HTML 标签结束）
+- `&` → `&amp;`（否则被解析为 HTML 实体开始）
+- `\left<` → `\left\langle`，`\right>` → `\right\rangle`
+- `\leq`、`\geq` 等 LaTeX 命令本身安全，不需要处理
+
+扫描所有 `$...$` 和 `$$...$$` 中的文本，执行上述替换。
 
 ### 4. 生成侧边导航
 从笔记的标题结构生成侧边栏目录，支持滚动高亮。
