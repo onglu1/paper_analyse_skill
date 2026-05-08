@@ -9,7 +9,7 @@ description: 深度分析单篇或多篇论文，生成详细笔记和评估，�
 
 统一论文解读入口，支持五种输出模式：
 - **精读笔记**（必选）— 六节结构的深度解读，含概念双链引用
-- **组会分享版** — 5 分钟快速讲解，图片为主
+- **简要版** — 5 分钟快速讲解，图片为主
 - **PPT 大纲（Marp）** — 可直接转 PDF/PPTX 的演示文稿
 - **HTML 幻灯片版** — 单页 HTML，键盘翻页，类 reveal.js
 - **HTML 长页面版** — 单页滚动式 HTML，侧边导航，KaTeX 公式
@@ -67,7 +67,7 @@ description: 深度分析单篇或多篇论文，生成详细笔记和评估，�
 问题：需要生成哪些输出？
 选项：
   ☑ 精读笔记（默认选中，必选）
-  □ 组会分享版
+  □ 简要版
   □ PPT 大纲（Marp 格式）
   □ HTML 幻灯片版
   □ HTML 长页面版
@@ -166,7 +166,7 @@ nvidia-smi --query-gpu=index,name,memory.free --format=csv,noheader
 根据模式启动对应的子 agent：
 1. **子 agent A（论文获取）**：下载/解压/转换/提取图片
 2. **子 agent B（精读笔记）**：读原文 → 提取概念 → 写 glossary.md → 写精读笔记
-3. **并行子 agent**（根据用户选择）：组会分享版 / PPT 大纲 / HTML 长页面版
+3. **并行子 agent**（根据用户选择）：简要版 / PPT 大纲 / HTML 长页面版
 4. **HTML 幻灯片版**（如选）：等 PPT 大纲完成后启动
 
 ### 多篇论文
@@ -231,7 +231,7 @@ ${output_dir}/<safe_title>/
 ├── source/                 # 原文（.tex/.bib 或 MinerU .md）
 ├── <safe_title>.md         # 精读笔记
 ├── glossary.md             # 概念速查（Obsidian 双链引用）
-├── <safe_title>-组会分享.md  # 组会版（如选）
+├── <safe_title>-简要版.md  # 简要版（如选）
 ├── <safe_title>-slides.html  # HTML 幻灯片版（如选）
 ├── <safe_title>-page.html    # HTML 长页面版（如选）
 └── <safe_title>-ppt.md       # Marp PPT 大纲（如选）
@@ -666,10 +666,10 @@ tags:
 
 ---
 
-### Prompt 5：组会分享版生成
+### Prompt 5：简要版生成
 
 ````
-你的任务是基于精读笔记生成适合组会分享的简化版笔记。
+你的任务是基于精读笔记生成简要版笔记。
 
 ## 输入
 - 论文输出目录: ${paper_dir}
@@ -678,7 +678,7 @@ tags:
 
 ## 必读参考文件
 
-1. `${skill_dir}/references/simple-template.md` — 组会分享版规范
+1. `${skill_dir}/references/simple-template.md` — 简要版规范
 
 ## 处理步骤
 
@@ -687,15 +687,15 @@ tags:
 - 读取 `${paper_dir}/glossary.md`（概念速查）
 
 ### 2. 查看可用图片
-列出 `${paper_dir}/images/` 中的所有图片，选择最适合组会分享的图片：
+列出 `${paper_dir}/images/` 中的所有图片，选择最适合简要版的图片：
 - 框架图/架构图（必选）
 - 原理示意图（如有）
 - 实验结果对比图（选最关键的 1-3 张）
 - case study / 可视化图（选最有说服力的 1-2 张）
 - 跳过：细节表格截图、大段公式截图
 
-### 3. 撰写组会分享版
-严格按照 `simple-template.md` 中的 5 部分结构撰写，保存到 `${paper_dir}/${safe_title}-组会分享.md`。
+### 3. 撰写简要版
+严格按照 `simple-template.md` 中的 5 部分结构撰写，保存到 `${paper_dir}/${safe_title}-简要版.md`。
 
 核心原则：
 - 基于精读笔记生成，不重新理解原文
@@ -712,13 +712,13 @@ venue: <从精读笔记提取>
 paper_type: system / method
 tags:
   - 论文笔记
-  - 组会分享
+  - 简要版
 ---
 ```
 
 ## 输出
 完成后报告：
-- 组会分享版路径
+- 简要版路径
 - 使用的图片数量
 - 笔记总字数
 ````

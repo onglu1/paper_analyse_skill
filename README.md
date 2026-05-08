@@ -12,7 +12,7 @@
 | 模式 | 说明 | 输出文件 |
 |------|------|----------|
 | 精读笔记 | obsidian笔记，六节结构的深度解读，含概念双链引用 | `.md` + `glossary.md` |
-| 组会分享版 | 5 分钟快速讲解，图片为主 | `-组会分享.md` |
+| 简要版 | 5 分钟快速讲解，图片为主 | `-简要版.md` |
 | PPT 大纲 | Marp 格式，可直接转 PDF/PPTX | `-ppt.md` |
 | HTML 幻灯片 | 单页 HTML，键盘翻页，类 reveal.js | `-slides.html` |
 | HTML 长页面 | 单页滚动 HTML，侧边导航，KaTeX 公式 | `-page.html` |
@@ -46,7 +46,7 @@
     └── references/
         ├── note-structure.md           # 精读笔记六节结构规范
         ├── note-template.md            # 写作风格规范
-        ├── simple-template.md          # 组会分享版规范
+        ├── simple-template.md          # 简要版规范
         ├── marp-template.md            # Marp PPT 大纲规范
         ├── html-slides-template.md     # HTML 幻灯片版规范 + 模板
         ├── html-page-template.md       # HTML 长页面版规范 + 模板
