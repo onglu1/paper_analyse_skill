@@ -1,0 +1,19 @@
+# MinerU 环境配置模板
+# 复制此文件为 mineru-config.yaml 并填入本机实际路径
+# mineru-config.yaml 已在 .gitignore 中，不会提交到仓库
+
+mineru:
+  # MinerU CLI 可执行文件路径
+  cli_path: "$HOME/.pyenv/versions/mineru/bin/mineru"
+
+  # mineru-router 可执行文件路径（多 GPU 并行时使用）
+  router_path: "$HOME/.pyenv/versions/mineru/bin/mineru-router"
+
+  # Python 解释器路径（MinerU 所在的 pyenv virtualenv）
+  python_path: "$HOME/.pyenv/versions/3.12.9/envs/mineru/bin/python"
+
+  # 模型来源（modelscope 或 huggingface）
+  model_source: "modelscope"
+
+  # 模型缓存目录
+  modelscope_cache: "$HOME/.cache/mineru/models"
