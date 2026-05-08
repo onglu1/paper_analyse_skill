@@ -38,20 +38,20 @@
 ## 目录结构
 
 ```
-paper-analyze/
-├── SKILL.md                          # 主 skill 定义
-├── .gitignore                        # 排除本地配置文件
-├── references/
-│   ├── note-structure.md             # 精读笔记六节结构规范
-│   ├── note-template.md              # 写作风格规范
-│   ├── simple-template.md            # 组会分享版规范
-│   ├── marp-template.md              # Marp PPT 大纲规范
-│   ├── html-slides-template.md       # HTML 幻灯片版规范 + 模板
-│   ├── html-page-template.md         # HTML 长页面版规范 + 模板
-│   ├── mineru-setup.md               # MinerU 安装与环境说明
-│   ├── mineru-config.yaml.template   # MinerU 配置模板（可提交）
-│   └── mineru-config.yaml            # 本机 MinerU 配置（本地生成，不提交）
-└── README.md
+.
+├── README.md
+├── .gitignore
+└── paper-analyze/
+    ├── SKILL.md                        # 主 skill 定义
+    └── references/
+        ├── note-structure.md           # 精读笔记六节结构规范
+        ├── note-template.md            # 写作风格规范
+        ├── simple-template.md          # 组会分享版规范
+        ├── marp-template.md            # Marp PPT 大纲规范
+        ├── html-slides-template.md     # HTML 幻灯片版规范 + 模板
+        ├── html-page-template.md       # HTML 长页面版规范 + 模板
+        ├── mineru-setup.md             # MinerU 安装与环境说明
+        └── mineru-config.yaml.template # MinerU 配置模板
 ```
 
 ## 依赖
