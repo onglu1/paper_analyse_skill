@@ -23,6 +23,13 @@
 - case study / 可视化图（选最有说服力的 1-2 张）
 - 跳过：细节表格截图、大段公式截图
 
+同时读取 `${paper_dir}/image_layout.json`，在插入图片时按其中的布局信息排版：
+- 使用 HTML 内嵌方式（与精读笔记相同的 flex 布局模板）
+- 并排图片保持并排，按 `relative_width` 设置 flex 比例
+- 图注格式：灰色小字（`color: #888; font-size: 0.85em;`）、非斜体、紧贴图片下方
+- 禁止使用 `![](images/xxx.png)` 的 Markdown 图片语法
+- 具体 HTML 模板参见 `${skill_dir}/references/note-template.md` 的"图片引用格式"章节
+
 ### 3. 撰写简要版
 严格按照 `simple-template.md` 中的 5 部分结构撰写，保存到 `${paper_dir}/${safe_title}-简要版.md`。
 
