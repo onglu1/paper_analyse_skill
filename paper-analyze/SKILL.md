@@ -203,6 +203,7 @@ ${output_dir}/<safe_title>/
 ## 依赖
 
 - `pdftoppm`（`apt install poppler-utils`，模式 A 需要）
+- `Pillow`（Python 库，兜底裁切白边，`pip install Pillow`）
 - MinerU 3.1.7（模式 B 需要，配置见 `references/mineru-setup.md`）
 - 网络连接（下载 arXiv 源码包 / PDF 时需要）
 
@@ -211,7 +212,7 @@ ${output_dir}/<safe_title>/
 | 操作 | 命令 |
 |------|------|
 | 解压源码包 | `tar -xzf paper.tar.gz -C /tmp/paper` |
-| PDF 图转 PNG | `pdftoppm -png -r 150 input.pdf output_prefix` |
+| PDF 图转 PNG | `pdftoppm -cropbox -png -r 150 input.pdf output_prefix` |
 | MinerU 配置 | `${skill_dir}/references/mineru-config.yaml`（从 template 复制并填入本机路径） |
 | MinerU 单卡转换 | `CUDA_VISIBLE_DEVICES=0 MINERU_MODEL_SOURCE=<source> <cli_path> -p input.pdf -o output -b hybrid-auto-engine -l en` |
 | MinerU 多卡 router | `<router_path> --local-gpus 0,1,2 --port 8002` |

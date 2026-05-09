@@ -55,9 +55,25 @@ mkdir -p "${PAPER_DIR}/downloads"
 ```bash
 # 查找图片目录（优先级：figure/ > pics/ > figures/ > fig/ > images/ > img/）
 # PDF 图片转 PNG
+# -cropbox 使用 CropBox 渲染而非 MediaBox，避免生成大片空白（LaTeX PDF 常见 MediaBox 远大于 CropBox）
 for f in $(find /tmp/arxiv_extract_$$ -name "*.pdf" -path "*/fig*"); do
-    pdftoppm -png -r 150 "$f" "${PAPER_DIR}/images/$(basename "$f" .pdf)"
+    pdftoppm -cropbox -png -r 150 "$f" "${PAPER_DIR}/images/$(basename "$f" .pdf)"
 done
+# 兜底裁边：对 CropBox 仍含白边的 PDF（如 CropBox=MediaBox 的情况），用 Pillow 裁切
+python3 -c "
+from PIL import Image
+import glob, sys
+for p in sorted(glob.glob('${PAPER_DIR}/images/*.png')):
+    img = Image.open(p)
+    gray = img.convert('L')
+    bin = gray.point(lambda x: 0 if x < 250 else 255, '1')
+    inv = bin.point(lambda x: 255 if x == 0 else 0, '1')
+    bbox = inv.getbbox()
+    if bbox and (bbox[0] > 3 or bbox[1] > 3 or (img.width-bbox[2]) > 3 or (img.height-bbox[3]) > 3):
+        w, h = img.width, img.height
+        img.crop(bbox).save(p)
+        print(f'  trim: {p} ({w}x{h} -> {bbox[2]-bbox[0]}x{bbox[3]-bbox[1]})')
+" 2>/dev/null || true
 # PNG/JPG 直接复制
 for d in figure pics figures fig images img; do
     if [ -d "/tmp/arxiv_extract_$$/$d" ]; then
