@@ -16,6 +16,7 @@
 | 术语悬停提示 | Tooltip，从 glossary JSON 查找 |
 | 回到顶部按钮 | 滚动超过 300px 显示 |
 | 阅读进度条 | 顶部固定，宽度随滚动比例变化 |
+| 内容宽度调节 | 右侧按钮展开面板，拖动滑块/预设按钮调节宽度，localStorage 持久化 |
 
 ## 配色方案
 
@@ -56,6 +57,7 @@
       --text: #333;
       --sidebar-bg: #f0f0f0;
       --sidebar-width: 260px;
+      --content-width: 800px;
       --code-bg: #f5f5f5;
       --border: #e0e0e0;
       --radius: 6px;
@@ -142,13 +144,12 @@
 
     /* === Main Content === */
     .content-wrapper {
-      margin-left: var(--sidebar-width);
       display: flex;
       justify-content: center;
       min-height: 100vh;
     }
     .content {
-      max-width: 800px;
+      max-width: var(--content-width);
       width: 100%;
       padding: 3rem 2rem;
     }
@@ -261,13 +262,123 @@
     }
     .back-to-top.visible { opacity: 1; transform: translateY(0); }
 
+    /* === Width Slider Panel === */
+    .width-toggle {
+      position: fixed;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 72px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px 0 0 6px;
+      cursor: pointer;
+      z-index: 201;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      writing-mode: vertical-lr;
+      letter-spacing: 0.1em;
+      transition: right 0.3s;
+      box-shadow: -1px 0 4px rgba(0,0,0,0.1);
+    }
+    .width-toggle.shifted { right: 260px; }
+    .width-toggle:hover { background: #1d4ed8; }
+
+    .width-panel {
+      position: fixed;
+      right: -280px;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background: #fff;
+      border-left: 1px solid var(--border);
+      z-index: 200;
+      padding: 2rem 1.5rem;
+      transition: right 0.3s ease;
+      box-shadow: -2px 0 12px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+    }
+    .width-panel.open { right: 0; }
+
+    .width-panel h3 {
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      color: #444;
+      font-weight: 600;
+    }
+
+    .width-panel label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 0.6rem;
+      color: #666;
+    }
+
+    .width-panel input[type="range"] {
+      width: 100%;
+      margin-bottom: 0.4rem;
+      accent-color: var(--primary);
+    }
+
+    .width-panel .width-value {
+      text-align: center;
+      font-size: 1.1rem;
+      color: var(--primary);
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+
+    .width-panel .preset-btns {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .width-panel .preset-btns button {
+      flex: 1;
+      padding: 0.4rem 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #555;
+      transition: all 0.15s;
+    }
+    .width-panel .preset-btns button:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .width-panel .reset-btn {
+      width: 100%;
+      padding: 0.6rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #666;
+      transition: all 0.15s;
+    }
+    .width-panel .reset-btn:hover {
+      background: #e5e5e5;
+    }
+
     /* === Responsive === */
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
       .sidebar.open { transform: translateX(0); }
       .hamburger { display: block; }
-      .content-wrapper { margin-left: 0; }
-      .content { padding: 2rem 1rem; padding-top: 4rem; }
+      .content-wrapper { }
+      .content { padding: 2rem 1rem; padding-top: 4rem; max-width: 100%; }
+      .width-toggle { display: none; }
+      .width-panel { display: none; }
     }
   </style>
 </head>
@@ -289,6 +400,24 @@
       <li><a href="#section-2" class="sub-item">1.1 问题定义</a></li>
       -->
     </ul>
+  </aside>
+
+  <!-- Width slider toggle -->
+  <button class="width-toggle" aria-label="Adjust content width" title="调节内容宽度">宽 度</button>
+
+  <!-- Width slider panel -->
+  <aside class="width-panel">
+    <h3>内容宽度调节</h3>
+    <label for="width-slider">文章区域宽度</label>
+    <input type="range" id="width-slider" min="500" max="1200" value="800" step="10">
+    <div class="width-value" id="width-display">800px</div>
+    <div class="preset-btns">
+      <button data-width="600">窄</button>
+      <button data-width="800">标准</button>
+      <button data-width="1000">宽</button>
+      <button data-width="1200">超宽</button>
+    </div>
+    <button class="reset-btn" id="reset-width">恢复默认</button>
   </aside>
 
   <!-- Main content -->
@@ -394,6 +523,70 @@
     // === Mobile hamburger toggle ===
     hamburger.addEventListener('click', () => {
       sidebar.classList.toggle('open');
+    });
+
+    // === Width Slider ===
+    const widthToggle = document.querySelector('.width-toggle');
+    const widthPanel = document.querySelector('.width-panel');
+    const widthSlider = document.getElementById('width-slider');
+    const widthDisplay = document.getElementById('width-display');
+    const resetBtn = document.getElementById('reset-width');
+    const presetBtns = document.querySelectorAll('.preset-btns button');
+    const root = document.documentElement;
+
+    const DEFAULT_WIDTH = 800;
+    const STORAGE_KEY = 'html-page-content-width';
+
+    function setContentWidth(w) {
+      const val = parseInt(w);
+      root.style.setProperty('--content-width', val + 'px');
+      widthSlider.value = val;
+      widthDisplay.textContent = val + 'px';
+      localStorage.setItem(STORAGE_KEY, val);
+    }
+
+    // Load saved width
+    (function() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setContentWidth(saved);
+        widthSlider.value = saved;
+      }
+    })();
+
+    widthToggle.addEventListener('click', () => {
+      const isOpen = widthPanel.classList.toggle('open');
+      widthToggle.classList.toggle('shifted', isOpen);
+    });
+
+    widthSlider.addEventListener('input', () => {
+      setContentWidth(widthSlider.value);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      setContentWidth(DEFAULT_WIDTH);
+    });
+
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setContentWidth(btn.dataset.width);
+      });
+    });
+
+    // Close panel on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        widthPanel.classList.remove('open');
+        widthToggle.classList.remove('shifted');
+      }
+    });
+
+    // Close panel when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!widthPanel.contains(e.target) && !widthToggle.contains(e.target) && !e.target.closest('.width-toggle')) {
+        widthPanel.classList.remove('open');
+        widthToggle.classList.remove('shifted');
+      }
     });
 
     // === Initialize KaTeX auto-render ===
