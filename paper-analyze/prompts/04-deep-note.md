@@ -18,7 +18,7 @@
 ## 处理步骤
 
 ### 1. 阅读论文原文
-读取 `${paper_dir}/source/` 中的所有文件：
+读取 `${paper_dir}/source/` 中的所有文件（跳过 `.full_backup` 备份文件）：
 - 如果是 `.tex` 文件：按优先级阅读（method > experiments > introduction > abstract > related > conclusion）
 - 如果是 `.md` 文件（MinerU 输出）：通读全文
 

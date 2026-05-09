@@ -57,7 +57,8 @@ kill $ROUTER_PID
 - **查询论文发表来源**：用 WebSearch 工具搜索标题，查找是否被会议/期刊接收（PDF 中通常没有显式标注）。搜到则记录，查不到标记为 "preprint"
 - 创建 `${output_dir}/${safe_title}/` 目录结构
 - 复制图片到 `images/`（执行图片过滤：只保留 Markdown 中明确引用且有图注的图片）
-- 复制 Markdown 到 `source/`
+- **剥离附录内容**：对每篇论文的 MinerU 输出 Markdown，使用 References 锚点法剥离附录——先找到 References/Bibliography 章节，检查其后下一章是否为附录，确认后阅读附录开头以确定结尾位置，截断并保留 `.full_backup` 备份。详见 `${skill_dir}/references/appendix-stripping.md`
+- 复制 Markdown（已剥离附录）到 `source/`
 - 复制原始 PDF 到 `downloads/`
 
 ### 7. 清理

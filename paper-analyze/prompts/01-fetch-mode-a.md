@@ -83,10 +83,39 @@ for d in figure pics figures fig images img; do
 done
 ```
 
-### 6. 保存原文到 source/
+### 6. 列出源码文件并识别附录
+
+arXiv 源码包中，附录通常以独立文件形式存在。列出所有 .tex 文件，由你自主判断哪些是附录：
+
 ```bash
-find /tmp/arxiv_extract_$$ -maxdepth 1 -type f \( -name "*.tex" -o -name "*.bib" -o -name "*.sty" -o -name "*.cls" -o -name "*.bst" \) -exec cp {} "${PAPER_DIR}/source/" \;
+echo "=== 解压目录中的所有 .tex 文件 ==="
+find /tmp/arxiv_extract_$$ -name "*.tex" | sort
+echo ""
+echo "=== 目录结构 ==="
+find /tmp/arxiv_extract_$$ -maxdepth 2 -type f | sort
 ```
+
+查看文件列表后，你需要自主判断哪些文件是附录文件。判断依据：
+- 文件名包含 "appendix"、"supplementary"、"supp" 等关键词 → 高度疑似附录
+- 文件名不明确时，读取文件开头（前几行）内容检查：
+  - 开头有 `\section{Appendix}`、`\appendix` 等 → 确认是附录
+  - 开头是常规章节如 `\section{Introduction}` → 不是附录
+- 如果主文件中有 `\include{appendix}` 或 `\input{appendix}` 引用，对应的文件就是附录
+
+如果你不确定某个文件是否为附录，宁可保留（保守原则）。
+
+### 6.5 保存原文到 source/（排除附录）
+
+确认附录文件后，执行以下操作：
+
+1. **不复制**附录文件到 `${PAPER_DIR}/source/`
+2. 复制所有非附录的 `.tex`、`.bib`、`.sty`、`.cls`、`.bst` 文件到 source/
+3. 对于主 `.tex` 文件，读取内容检查：
+   - 如果存在 `\appendix` 命令，截断其后内容（保留 `.full_backup` 备份）
+   - 如果存在 `\include{appendix}`、`\input{appendix}` 等引用，注释掉该行
+4. 如果主文件被截断，保存截断后的版本到 source/，完整版保留为 `.full_backup`
+
+详细的附录剥离方法论见 `${skill_dir}/references/appendix-stripping.md`。
 
 ### 7. 保存原始压缩包
 ```bash

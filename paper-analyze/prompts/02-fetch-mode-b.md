@@ -74,6 +74,27 @@ cp ${output_dir}/mineru_output/*/auto/images/* "${PAPER_DIR}/images/"
 
 具体做法：读取 MinerU 的 Markdown 文件，找出所有 `![...](...)`  引用的图片文件名，只保留这些图片。然后进一步检查每张图片在 Markdown 中的上下文，如果只是行内公式或无意义的装饰图，也删除。
 
+### 5.5 剥离附录内容（重要）
+
+附录内容会严重消耗后续所有 agent（精读、简要版、PPT、HTML等）的 token 和时间。必须在保存到 source/ 前剥离。
+
+**剥离策略（References 锚点法）：**
+
+1. 读取 MinerU 输出的 Markdown 文件
+2. 找到 **References / Bibliography** 章节（搜索 `# References`、`# Bibliography`、`## References` 等标题）——这是论文结构中最稳定的锚点
+3. 查看 References 之后的下一章标题，判断是否为附录：
+   - 标题包含 "Appendix"、"Appendices"
+   - 标题形式为 `# A.`、`## A.` 且内容为补充材料
+   - 标题包含 "Supplementary"、"Supplemental Material"
+4. 如果确认是附录：
+   a. 阅读附录开头部分（前 20-30 行），了解附录的章节结构
+   b. 确定附录的结尾位置：大多数情况下附录延续到文件末尾；少数情况附录后有 Acknowledgments、Author Contributions 等短章节
+   c. 从附录标题行开始截断
+5. 如果 References 之后找不到明显附录标记，检查全文是否有 `# Appendix` 或 `\appendix` 等标记
+6. 截断后的内容保存到 source/，完整原文保留 `.full_backup` 备份
+
+详细的附录剥离方法论见 `${skill_dir}/references/appendix-stripping.md`。
+
 ### 6. 保存原文到 source/
 ```bash
 MINERU_MD=$(ls ${output_dir}/mineru_output/*/auto/*.md | head -1)
