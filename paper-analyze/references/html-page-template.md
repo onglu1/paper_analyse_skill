@@ -144,6 +144,7 @@
 
     /* === Main Content === */
     .content-wrapper {
+      margin-left: var(--sidebar-width);
       display: flex;
       justify-content: center;
       min-height: 100vh;
@@ -375,7 +376,7 @@
       .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
       .sidebar.open { transform: translateX(0); }
       .hamburger { display: block; }
-      .content-wrapper { }
+      .content-wrapper { margin-left: 0; }
       .content { padding: 2rem 1rem; padding-top: 4rem; max-width: 100%; }
       .width-toggle { display: none; }
       .width-panel { display: none; }

@@ -98,7 +98,7 @@ $$
 ### 单图（layout: "single"）
 
 ```html
-<div style="text-align: center; margin: 1rem 0;">
+<div style="text-align: center; margin: 1rem auto; max-width: {display_width};">
   <img src="images/xxx.png" style="max-width: 100%;" />
   <div style="color: #888; font-size: 0.85em; margin-top: 4px;">图注内容</div>
 </div>
@@ -109,7 +109,7 @@ $$
 等宽时 flex 值相同，不等宽时按 relative_width 比例设置 flex 值：
 
 ```html
-<div style="display: flex; gap: 8px; margin: 1rem 0; align-items: flex-start;">
+<div style="display: flex; gap: 8px; margin: 1rem auto; align-items: flex-start; max-width: {display_width};">
   <div style="flex: {ratio_1};">
     <img src="images/a.png" style="width: 100%;" />
   </div>
@@ -125,7 +125,7 @@ flex 值计算：将 relative_width 乘以 10 取整。如 0.6 和 0.4 → flex:
 ### 三图并排（layout: "grid-3"）
 
 ```html
-<div style="display: flex; gap: 8px; margin: 1rem 0; align-items: flex-start;">
+<div style="display: flex; gap: 8px; margin: 1rem auto; align-items: flex-start; max-width: {display_width};">
   <div style="flex: {ratio_1};"><img src="images/a.png" style="width: 100%;" /></div>
   <div style="flex: {ratio_2};"><img src="images/b.png" style="width: 100%;" /></div>
   <div style="flex: {ratio_3};"><img src="images/c.png" style="width: 100%;" /></div>
@@ -136,7 +136,7 @@ flex 值计算：将 relative_width 乘以 10 取整。如 0.6 和 0.4 → flex:
 ### 四图及以上网格（layout: "grid-4" 或 "grid"）
 
 ```html
-<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 1rem 0;">
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 1rem auto; max-width: {display_width};">
   <img src="images/a.png" style="width: 100%;" />
   <img src="images/b.png" style="width: 100%;" />
   <img src="images/c.png" style="width: 100%;" />
@@ -165,7 +165,7 @@ flex 值计算：将 relative_width 乘以 10 取整。如 0.6 和 0.4 → flex:
 如果 `image_layout.json` 不存在或某张图片不在其中，使用单图模板：
 
 ```html
-<div style="text-align: center; margin: 1rem 0;">
+<div style="text-align: center; margin: 1rem auto; max-width: 80%;">
   <img src="images/xxx.png" style="max-width: 100%;" />
   <div style="color: #888; font-size: 0.85em; margin-top: 4px;">图片描述</div>
 </div>

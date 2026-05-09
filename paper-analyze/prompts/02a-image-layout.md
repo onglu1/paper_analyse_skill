@@ -53,18 +53,28 @@
 2. 有显式 `width` 参数 → 直接使用
 3. 无显式 `width` 但在 subfigure/minipage 中 → 按等宽分配（1/n）
 
-### 4. 计算相对宽度
+### 4. 计算相对宽度和显示宽度
 
 **Mode B：**
 - 每张图的宽度 = `x1 - x0`（千分比单位）
 - 相对于栏宽的比例 = `(x1 - x0) / column_width`
 - 同组图片的 `relative_width` = 各自比例归一化（使组内总和 = 1.0）
+- **`display_width`**（整组图片占内容区的百分比）：
+  - 计算整组图片在原文中占**页面全宽**的比例：`group_page_ratio = 整组图片的总 bbox 宽度 / 1000`
+  - 双栏论文中，如果图片跨双栏（宽度 > 600 千分比），`display_width` = "100%"
+  - 双栏论文中，如果图片仅在单栏内（宽度 ≤ 栏宽），`display_width` = 图片宽度占页面宽度的比例，映射到 "40%"~"50%"
+  - 单栏论文中，`display_width` = 图片宽度占页面宽度的比例，直接映射为百分比（如占 80% 页宽 → "80%"）
 
 **Mode A：**
 - 从 `width=0.48\textwidth` 提取数值 0.48
 - 从 `\begin{subfigure}{0.48\textwidth}` 提取数值 0.48
 - 同组图片的 `relative_width` = 各自 width 值归一化（使组内总和 = 1.0）
 - 无显式 width 时，n 张并排图各为 `1/n`
+- **`display_width`**：
+  - `\begin{figure*}` 环境（双栏论文跨栏图）→ "100%"
+  - `\begin{figure}` 环境中，所有子图 width 之和即为整组占栏宽的比例
+  - 双栏论文单栏图：整组占栏宽比例 × 50%（因为一栏约占页面 50%），映射为 "40%"~"50%"
+  - 单栏论文：整组占 textwidth 的比例直接作为 display_width
 
 ### 5. 确定布局类型
 
@@ -92,7 +102,8 @@
       "images": [
         {"file": "images/xxx.jpg", "relative_width": 1.0}
       ],
-      "layout": "single"
+      "layout": "single",
+      "display_width": "80%"
     }
   ]
 }
@@ -104,6 +115,7 @@
 - `images[].file`: 图片文件相对路径（相对于 paper_dir）
 - `images[].relative_width`: 组内相对宽度（总和 = 1.0）
 - `layout`: `single` | `side-by-side` | `grid-3` | `grid-4` | `grid`
+- `display_width`: 整组图片占内容区宽度的百分比（如 "100%"、"80%"、"45%"），反映原文中图片的实际大小比例
 
 ### 兜底规则
 

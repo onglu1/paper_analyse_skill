@@ -18,6 +18,11 @@
 ### 2. 读取 HTML 模板骨架
 从 `html-page-template.md` 中获取基础 HTML 模板。
 
+**重要：必须完整复制模板中的 CSS 和 HTML 结构，不得自行修改或重写样式。** 特别注意：
+- `.content-wrapper` 必须有 `margin-left: var(--sidebar-width)` 和 `justify-content: center`，确保内容在侧边栏右侧居中显示
+- 响应式断点中 `.content-wrapper` 的 `margin-left: 0` 不能遗漏
+- 不要自己编写替代 CSS，直接使用模板中的完整 `<style>` 块
+
 ### 3. 将 Markdown 转换为 HTML 内容
 - 标题 → `<h1>` ~ `<h4>`
 - 段落 → `<p>`
