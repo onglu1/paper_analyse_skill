@@ -91,19 +91,85 @@ $$
 
 ## 6. 图片引用格式
 
-使用以下格式插入图片：
+**重要：必须先读取 `${paper_dir}/image_layout.json`，按其中的布局信息排版图片。**
 
-```markdown
-![图片描述](images/xxx.png)
-*图片下方一行简短中文解释。*
+根据 `image_layout.json` 中每个 figure 的 `layout` 字段，使用对应的 HTML 模板：
+
+### 单图（layout: "single"）
+
+```html
+<div style="text-align: center; margin: 1rem 0;">
+  <img src="images/xxx.png" style="max-width: 100%;" />
+  <div style="color: #888; font-size: 0.85em; margin-top: 4px;">图注内容</div>
+</div>
 ```
 
-图片放置位置的优先规则：
+### 并排双图（layout: "side-by-side"）
+
+等宽时 flex 值相同，不等宽时按 relative_width 比例设置 flex 值：
+
+```html
+<div style="display: flex; gap: 8px; margin: 1rem 0; align-items: flex-start;">
+  <div style="flex: {ratio_1};">
+    <img src="images/a.png" style="width: 100%;" />
+  </div>
+  <div style="flex: {ratio_2};">
+    <img src="images/b.png" style="width: 100%;" />
+  </div>
+</div>
+<div style="color: #888; font-size: 0.85em; text-align: center;">图注内容</div>
+```
+
+flex 值计算：将 relative_width 乘以 10 取整。如 0.6 和 0.4 → flex: 6 和 flex: 4。等宽时都用 flex: 1。
+
+### 三图并排（layout: "grid-3"）
+
+```html
+<div style="display: flex; gap: 8px; margin: 1rem 0; align-items: flex-start;">
+  <div style="flex: {ratio_1};"><img src="images/a.png" style="width: 100%;" /></div>
+  <div style="flex: {ratio_2};"><img src="images/b.png" style="width: 100%;" /></div>
+  <div style="flex: {ratio_3};"><img src="images/c.png" style="width: 100%;" /></div>
+</div>
+<div style="color: #888; font-size: 0.85em; text-align: center;">图注内容</div>
+```
+
+### 四图及以上网格（layout: "grid-4" 或 "grid"）
+
+```html
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 1rem 0;">
+  <img src="images/a.png" style="width: 100%;" />
+  <img src="images/b.png" style="width: 100%;" />
+  <img src="images/c.png" style="width: 100%;" />
+  <img src="images/d.png" style="width: 100%;" />
+</div>
+<div style="color: #888; font-size: 0.85em; text-align: center;">图注内容</div>
+```
+
+### 图注格式规范
+
+- 灰色小字：`color: #888; font-size: 0.85em;`
+- 非斜体（不使用 `<em>` 或 `font-style: italic`）
+- 紧贴图片下方：`margin-top: 4px;`
+- 内容为中文，保留图片编号（如"图1："）
+- 图注内容来自 `image_layout.json` 中的 `caption` 字段
+
+### 图片放置位置
 
 - 框架图 → 方法总览部分
 - 实验结果对比图 → 评测部分
 - 消融分析图 → 评测部分
 - Case study 图 → 评测部分
+
+### 兜底
+
+如果 `image_layout.json` 不存在或某张图片不在其中，使用单图模板：
+
+```html
+<div style="text-align: center; margin: 1rem 0;">
+  <img src="images/xxx.png" style="max-width: 100%;" />
+  <div style="color: #888; font-size: 0.85em; margin-top: 4px;">图片描述</div>
+</div>
+```
 
 ---
 
