@@ -109,9 +109,10 @@ curl -sL "https://arxiv.org/pdf/<ARXIV_ID>" -o paper.pdf
 
 根据模式启动对应的子 agent：
 1. **子 agent A（论文获取）**：下载/解压/转换/提取图片
-2. **子 agent B（精读笔记）**：读原文 → 提取概念 → 写 glossary.md → 写精读笔记
-3. **并行子 agent**（根据用户选择）：简要版 / PPT 大纲 / HTML 长页面版
-4. **HTML 幻灯片版**（如选）：等 PPT 大纲完成后启动
+2. **子 agent A2（图片布局分析）**：分析图片空间关系 → 输出 image_layout.json（依赖 A 完成）
+3. **子 agent B（精读笔记）**：读原文 → 读 image_layout.json → 提取概念 → 写 glossary.md → 写精读笔记（依赖 A2 完成）
+4. **并行子 agent**（根据用户选择）：简要版 / PPT 大纲 / HTML 长页面版
+5. **HTML 幻灯片版**（如选）：等 PPT 大纲完成后启动
 
 ### 多篇论文
 
@@ -192,6 +193,7 @@ ${output_dir}/<safe_title>/
 | 0 | `${skill_dir}/prompts/00-mineru-setup.md` | MinerU 环境检查 + GPU 选择 | 有模式 B 论文时 |
 | 1 | `${skill_dir}/prompts/01-fetch-mode-a.md` | 论文获取（LaTeX 源码包） | 模式 A 论文 |
 | 2 | `${skill_dir}/prompts/02-fetch-mode-b.md` | 论文获取（PDF + MinerU） | 模式 B 单篇论文 |
+| 2a | `${skill_dir}/prompts/02a-image-layout.md` | 图片布局分析 | 论文获取完成后，精读笔记前 |
 | 3 | `${skill_dir}/prompts/03-mineru-batch.md` | MinerU 多 GPU 并行转换 | 模式 B 多篇论文 |
 | 4 | `${skill_dir}/prompts/04-deep-note.md` | 精读笔记 + glossary 生成 | 必选，最先执行 |
 | 5 | `${skill_dir}/prompts/05-simple-note.md` | 简要版笔记 | 用户选择"简要版" |
@@ -209,6 +211,7 @@ ${output_dir}/<safe_title>/
 - `${selected_gpus}` — 用户选择的所有 GPU（逗号分隔）
 - `${skill_dir}` — 本 skill 目录的绝对路径
 - `${research_purpose}` — 用户的调研目的（如有）
+- `${input_mode}` — 输入模式（A = LaTeX 源码, B = PDF/MinerU）
 
 ---
 
