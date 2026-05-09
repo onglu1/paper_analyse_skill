@@ -22,7 +22,11 @@
 - 标题 → `<h1>` ~ `<h4>`
 - 段落 → `<p>`
 - 列表 → `<ul>/<ol>`
-- 图片 → `<img>` + lightbox 支持
+- 图片 → 读取 `${paper_dir}/image_layout.json`，按布局信息生成 HTML：
+  - 单图：`<figure>` + `<img>` + `<figcaption>` + lightbox
+  - 并排图：`<div style="display: flex;">` 容器 + 多个 `<figure>` + lightbox
+  - 图注样式：`color: #888; font-size: 0.85em; font-style: normal; text-align: center;`
+  - flex 比例按 `relative_width` 乘以 10 取整设置
 - 公式 → KaTeX 自动渲染（`$...$` 和 `$$...$$`）
 - 代码块 → `<pre><code>` + highlight.js
 - `[[glossary#概念名|概念名]]` → `<span class="glossary-term" data-term="概念名">概念名</span>`
