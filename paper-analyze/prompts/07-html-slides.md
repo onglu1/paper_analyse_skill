@@ -14,6 +14,32 @@
 ### 1. 读取 PPT 大纲
 读取 `${paper_dir}/${safe_title}-ppt.md`（Marp 格式）。
 
+### 1.5 读取图片布局信息
+
+读取 `${paper_dir}/image_layout.json`，在将图片转换为 HTML 时按布局信息排版：
+- 并排图片使用 flex 容器，按 `relative_width` 比例分配宽度
+- 单图居中显示
+- 图注格式：`<figcaption style="color: #888; font-size: 0.75em; text-align: center; font-style: normal;">图注内容</figcaption>`
+
+图片 HTML 模板：
+
+单图：
+```html
+<figure style="text-align: center; margin: 0.5rem 0;">
+  <img src="images/xxx.png" style="max-width: 80%; max-height: 60vh;" />
+  <figcaption style="color: #888; font-size: 0.75em; font-style: normal;">图注</figcaption>
+</figure>
+```
+
+并排图：
+```html
+<div style="display: flex; gap: 8px; justify-content: center; align-items: flex-start;">
+  <img src="images/a.png" style="flex: {ratio}; max-height: 50vh; object-fit: contain;" />
+  <img src="images/b.png" style="flex: {ratio}; max-height: 50vh; object-fit: contain;" />
+</div>
+<div style="color: #888; font-size: 0.75em; text-align: center;">图注</div>
+```
+
 ### 2. 读取 HTML 模板骨架
 从 `html-slides-template.md` 中获取基础 HTML 模板。
 
