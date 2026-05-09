@@ -85,6 +85,8 @@ $$
 \mathcal{L} = \sum_{i=1}^{N} \ell(f(x_i), y_i)
 $$
 
+**公式命令兼容性：论文源码常在 preamble 或 `math_commands.tex` 中通过 `\newcommand` 定义自定义命令（如 `\crossmark` → `\ding{55}`）。这些命令在原论文 PDF 中正常渲染，但 KaTeX / MathJax / Obsidian 不支持。将公式写入笔记时，不能直接抄原文的自定义命令——需查定义后替换为标准等价写法。对于 ✗、✓、✶ 等装饰性符号，优先用 Unicode 字符直接写在 Markdown 中。
+
 ---
 
 ## 6. 图片引用格式

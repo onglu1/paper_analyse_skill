@@ -104,6 +104,27 @@ tags:
 - 独立公式用 `$$...$$` 包裹
 - 确保在 Obsidian 中能正确渲染
 
+**公式命令兼容性检查（重要）：**
+
+论文原文常通过 `\newcommand`、`\renewcommand`、`\def` 定义自定义 LaTeX 命令（查阅主 .tex 文件的 preamble 和 `math_commands.tex` 等文件）。这些命令在原论文 PDF 编译时正常渲染，但 **KaTeX / MathJax / Obsidian 不支持这些自定义命令**，直接抄入笔记会导致公式无法显示。
+
+**处理规则：**
+1. 在阅读论文源码时（Mode A），注意 preamble 中的 `\newcommand`/`\renewcommand`/`\def` 定义
+2. 将公式写入笔记时，**不能直接抄原文中的自定义命令**，必须替换为标准等价的写法
+3. 对于装饰性符号（✗、✓、✶ 等），优先直接用 **Unicode 字符**写在 Markdown 中（不在 `$...$` 内）
+4. 对于数学运算类自定义命令，查找其定义并替换为标准 LaTeX 写法
+
+**常见自定义命令替换对照：**
+
+| 原文自定义命令 | 问题 | 替换为 |
+|--------------|------|--------|
+| `\crossmark`（通常定义为 `\ding{55}` 或类似） | pifont 包不可用 | Unicode ✗，或直接写中文「错误」「未通过」 |
+| `\checkmark` 被 `\renewcommand` 重定义 | 覆盖了标准行为 | Unicode ✓ |
+| `\newcommand{\xxx}{\text{\ding{XX}}}` | pifont 包不可用 | 找到对应的 Unicode 符号直接写 |
+| 其他 `\xxxmark` 类自定义命令 | 非标准命令 | 根据上下文理解含义，用 Unicode 或中文替代 |
+
+**一般原则：写入笔记的公式只能使用 KaTeX 支持的标准命令**（完整列表见 https://katex.org/docs/supported.html）。不确定的命令就去查定义，查不到就用中文或 Unicode 表述。
+
 ### 8. 最终自查
 - 从头到尾扫一遍，对每个专业术语确认：如果读者只看这篇笔记，能理解这个词吗？
 - 确认所有 `[[glossary#概念名|概念名]]` 在 glossary.md 中都有对应的 `## 概念名` 标题
