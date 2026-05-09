@@ -17,6 +17,11 @@
 ### 2. 查看可用图片
 列出 `${paper_dir}/images/`，规划每页使用哪张图片。
 
+同时读取 `${paper_dir}/image_layout.json`，在规划图片使用时参考布局信息：
+- 并排图片（`side-by-side`）：使用 Marp 的 `![bg right:50%]` 语法或多背景图语法
+- 单图：根据 `relative_width` 选择合适的宽度参数（`![w:400]` ~ `![w:700]`）
+- 图注：在图片下方用小字标注，格式为 `<span style="color: #888; font-size: 0.7em;">图注内容</span>`
+
 ### 3. 撰写 PPT 大纲
 严格按照 `marp-template.md` 中的规范撰写，保存到 `${paper_dir}/${safe_title}-ppt.md`。
 
