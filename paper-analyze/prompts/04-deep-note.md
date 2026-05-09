@@ -25,6 +25,16 @@
 ### 2. 查看可用图片
 列出 `${paper_dir}/images/` 中的所有图片，理解每张图片的内容和在论文中的位置。
 
+### 2.5 读取图片布局信息
+
+读取 `${paper_dir}/image_layout.json`（由布局分析 Agent 生成）。该文件描述了每张图片的：
+- 并排分组关系（哪些图片应该并排显示）
+- 相对宽度比例（`relative_width`）
+- 布局类型（`single`、`side-by-side`、`grid-3` 等）
+- 中文图注（`caption`）
+
+在后续撰写笔记时，**必须按照此文件中的布局信息排版图片**，使用 `note-template.md` 中定义的 HTML 模板。不要使用 `![](images/xxx.png)` 的 Markdown 图片语法。
+
 ### 3. 提取概念，建立 glossary 大纲（只建标题，内容留空）
 
 通读全文后，从以下 5 类概念中提取需要解释的术语：
@@ -51,9 +61,11 @@
 - 术语首次出现时用 `[[glossary#概念名|概念名]]` 双链标记，引用到 glossary.md 中对应的标题节
 - 概念不在主干中展开解释（解释在 glossary.md 中）
 - 笔记中需要的概念如果在步骤 3 的 glossary 大纲中没有，**仍然先写上双链引用**，后续步骤会补齐
-- 在合适位置插入图片（`![描述](images/xxx.png)`）
-- 每张图片下方加一行中文解释
+- 在合适位置插入图片，**必须使用 `note-template.md` 中定义的 HTML 模板**，根据 `image_layout.json` 中的 layout 类型选择对应模板
+- 图注使用 `image_layout.json` 中的 `caption` 字段内容，格式为灰色小字非斜体
+- 并排图片使用 flex 布局，按 `relative_width` 设置 flex 比例
 - 图片越多越好，但不要引入 MinerU 的公式图片
+- 禁止使用 `![](images/xxx.png)` 的 Markdown 图片语法
 
 Frontmatter 格式：
 ```yaml
