@@ -1,4 +1,4 @@
-你的任务是基于精读笔记生成单页滚动式 HTML 长页面。
+你的任务是基于精读笔记生成 HTML 长页面的内容片段，然后调用拼接脚本组装最终 HTML。
 
 ## 输入
 - 论文输出目录: ${paper_dir}
@@ -7,7 +7,7 @@
 
 ## 必读参考文件
 
-1. `${skill_dir}/references/html-page-template.md` — HTML 长页面版规范和模板骨架
+1. `${skill_dir}/references/html-page-template.md` — HTML 长页面内容转换规范
 
 ## 处理步骤
 
@@ -15,25 +15,23 @@
 - 读取 `${paper_dir}/${safe_title}.md`（精读笔记）
 - 读取 `${paper_dir}/glossary.md`（概念速查）
 
-### 2. 读取 HTML 模板骨架
-从 `html-page-template.md` 中获取基础 HTML 模板。
+### 2. 读取图片布局信息
+- 读取 `${paper_dir}/image_layout.json`
 
-**重要：必须完整复制模板中的 CSS 和 HTML 结构，不得自行修改或重写样式。** 特别注意：
-- `.content-wrapper` 必须有 `margin-left: var(--sidebar-width)` 和 `justify-content: center`，确保内容在侧边栏右侧居中显示
-- 响应式断点中 `.content-wrapper` 的 `margin-left: 0` 不能遗漏
-- 不要自己编写替代 CSS，直接使用模板中的完整 `<style>` 块
+### 3. 生成正文 HTML 片段
 
-### 3. 将 Markdown 转换为 HTML 内容
-- 标题 → `<h1>` ~ `<h4>`
+将 Markdown 转换为 HTML 元素，保存到 `${paper_dir}/_page_content.html`：
+
+- 标题 → `<h2 id="section-N">` ~ `<h4>`（h2/h3 必须有 id 属性）
 - 段落 → `<p>`
 - 列表 → `<ul>/<ol>`
-- 图片 → 读取 `${paper_dir}/image_layout.json`，按布局信息生成 HTML：
+- 图片 → 按 image_layout.json 布局信息生成：
   - 单图：`<figure>` + `<img>` + `<figcaption>` + lightbox
   - 并排图：`<div style="display: flex;">` 容器 + 多个 `<figure>` + lightbox
   - 图注样式：`color: #888; font-size: 0.85em; font-style: normal; text-align: center;`
   - flex 比例按 `relative_width` 乘以 10 取整设置
-- 公式 → KaTeX 自动渲染（`$...$` 和 `$$...$$`）
-- 代码块 → `<pre><code>` + highlight.js
+- 公式 → 保持 `$...$` 和 `$$...$$` 格式（KaTeX 自动渲染）
+- 代码块 → `<pre><code class="language-xxx">...</code></pre>`
 - `[[glossary#概念名|概念名]]` → `<span class="glossary-term" data-term="概念名">概念名</span>`
 
 ### 3.5 公式特殊字符转义（重要）
@@ -46,37 +44,49 @@
 
 扫描所有 `$...$` 和 `$$...$$` 中的文本，执行上述替换。
 
-### 4. 生成侧边导航
-从笔记的标题结构生成侧边栏目录，支持滚动高亮。
+### 4. 生成侧边导航片段
 
-### 5. 注入 glossary 数据
-将 glossary.md 中的概念解释转换为 JSON，注入到 HTML 中供 tooltip 使用：
-```javascript
-const glossaryData = {
-  "概念名": { fullName: "全称", explanation: "解释", role: "角色" },
-  ...
-};
+从正文中所有 `<h2>` 和 `<h3>` 提取标题和 id，生成导航列表，保存到 `${paper_dir}/_page_nav.html`：
+
+```html
+<li><a href="#section-1">研究背景</a></li>
+<li><a href="#section-1-1" class="sub-item">问题定义</a></li>
 ```
 
-### 6. 生成完整 HTML 文件
-将所有内容填充到模板骨架中，保存到 `${paper_dir}/${safe_title}-page.html`。
+### 5. 生成 glossary JSON
 
-功能要求：
-- 侧边导航栏（跟随滚动高亮）
-- 图片点击放大（lightbox）
-- 公式渲染（KaTeX CDN）
-- 代码高亮（highlight.js CDN）
-- glossary 术语悬停提示（tooltip）
-- 响应式设计（移动端隐藏侧边栏）
-- 回到顶部按钮
-- 阅读进度条
-- 内容宽度调节（右侧面板拖动滑块，localStorage 持久化）
+将 glossary.md 中的概念解释转换为 JSON 对象，保存到 `${paper_dir}/_page_glossary.json`：
 
-### 7. 验证
+```json
+{
+  "概念名": "全称。解释文本。",
+  "GRPO": "Group Relative Policy Optimization。一种基于组内相对排序的策略优化算法。"
+}
+```
+
+### 6. 调用拼接脚本组装最终 HTML
+
+```bash
+python3 ${skill_dir}/scripts/assemble_html_page.py \
+  --template "${skill_dir}/templates/page.html" \
+  --content "${paper_dir}/_page_content.html" \
+  --nav "${paper_dir}/_page_nav.html" \
+  --glossary "${paper_dir}/_page_glossary.json" \
+  --title "${paper_title}" \
+  --output "${paper_dir}/${safe_title}-page.html"
+```
+
+### 7. 清理临时文件
+
+```bash
+rm -f "${paper_dir}/_page_content.html" "${paper_dir}/_page_nav.html" "${paper_dir}/_page_glossary.json"
+```
+
+### 8. 验证
 检查生成的 HTML 文件：
 - 文件大小合理
 - 所有图片路径正确
-- glossary 数据完整
+- 用 grep 确认 `justify-content: center` 存在（CSS 完整性检查）
 
 ## 输出
 完成后报告：
