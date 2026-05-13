@@ -1,4 +1,4 @@
-你的任务是基于 PPT 大纲（Marp 格式）生成单页 HTML 幻灯片文件。
+你的任务是基于 PPT 大纲（Marp 格式）生成 HTML 幻灯片的内容片段，然后调用拼接脚本组装最终 HTML。
 
 ## 输入
 - 论文输出目录: ${paper_dir}
@@ -7,7 +7,7 @@
 
 ## 必读参考文件
 
-1. `${skill_dir}/references/html-slides-template.md` — HTML 幻灯片版规范和模板骨架
+1. `${skill_dir}/references/html-slides-template.md` — HTML 幻灯片内容转换规范
 
 ## 处理步骤
 
@@ -40,20 +40,39 @@
 <div style="color: #888; font-size: 0.75em; text-align: center;">图注</div>
 ```
 
-### 2. 读取 HTML 模板骨架
-从 `html-slides-template.md` 中获取基础 HTML 模板。
+### 2. 生成 sections HTML 片段
 
-### 3. 将 Marp 内容转换为 HTML sections
-按照 `html-slides-template.md` 中的映射规则，将每页 Marp 内容转换为 `<section>` 标签。
+将 Marp 内容转换为 `<section>` 标签，保存到 `${paper_dir}/_slides_sections.html`：
 
 转换规则：
-- 每个 `---` 分隔的页面 → 一个 `<section>`
+- 每个 `---` 分隔的页面 → 一个 `<section class="slide">`（第一个加 `active` 类）
+- 每个 section 内部用 `<div class="slide-content">` 包裹
 - 页标题 → `<h2>`
 - 要点列表 → `<ul><li>`
 - 图片引用 → `<img>` 标签（使用相对路径 `images/xxx.png`）
-- 公式 → KaTeX 渲染（`$...$` → `<span class="katex">`, `$$...$$` → `<div class="katex-display">`）
+- 公式 → 保持 `$...$` 和 `$$...$$` 格式
 
-### 3.5 公式特殊字符转义（重要）
+示例输出：
+```html
+<section class="slide active">
+  <div class="slide-content">
+    <h1>论文标题</h1>
+    <p style="text-align:center; color: var(--primary-color);">作者信息</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="slide-content">
+    <h2>研究背景</h2>
+    <ul>
+      <li>要点一</li>
+      <li>要点二</li>
+    </ul>
+  </div>
+</section>
+```
+
+### 2.5 公式特殊字符转义（重要）
 公式中的某些符号与 HTML 语法冲突，必须转义：
 - `<` → `\lt`（否则被解析为 HTML 标签开始）
 - `>` → `\gt`（否则被解析为 HTML 标签结束）
@@ -63,21 +82,28 @@
 
 扫描所有 `$...$` 和 `$$...$$` 中的文本，执行上述替换。
 
-### 4. 生成完整 HTML 文件
-将转换后的内容填充到模板骨架中，保存到 `${paper_dir}/${safe_title}-slides.html`。
+### 3. 调用拼接脚本组装最终 HTML
 
-功能要求：
-- 键盘左右翻页（ArrowLeft/ArrowRight）
-- 进度条显示当前页/总页数
-- 图片点击放大
-- 深色主题
-- 响应式设计
+```bash
+python3 ${skill_dir}/scripts/assemble_html_slides.py \
+  --template "${skill_dir}/templates/slides.html" \
+  --sections "${paper_dir}/_slides_sections.html" \
+  --title "${paper_title}" \
+  --output "${paper_dir}/${safe_title}-slides.html"
+```
+
+### 4. 清理临时文件
+
+```bash
+rm -f "${paper_dir}/_slides_sections.html"
+```
 
 ### 5. 验证
 在终端中检查生成的 HTML 文件：
 - 文件大小合理
-- 包含所有 section
+- 用 grep 统计 `<section` 数量确认所有页面都在
 - 图片路径正确
+- 用 grep 确认 `var(--bg-color)` 存在（CSS 完整性检查）
 
 ## 输出
 完成后报告：
