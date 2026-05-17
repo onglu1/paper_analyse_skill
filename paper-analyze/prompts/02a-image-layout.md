@@ -5,6 +5,10 @@
 - 输入模式: ${input_mode} (A = LaTeX 源码, B = PDF/MinerU)
 - Skill 目录: ${skill_dir}
 
+## 必读参考文件
+
+本任务无额外 reference 依赖，所有布局判断规则均在本文件中定义。
+
 ## 输出
 在 `${paper_dir}/image_layout.json` 中写入图片布局描述。
 

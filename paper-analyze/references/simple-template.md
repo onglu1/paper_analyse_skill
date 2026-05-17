@@ -47,10 +47,14 @@
 ---
 title: 论文标题
 year: 2026
-venue: 具体发表地方
-paper_type: system / method
+venue: 发表来源
+paper_type: system
 tags:
   - 论文笔记
   - 简要版
 ---
 ```
+
+**字段值约束（必须遵守，否则 YAML 解析报错）：**
+- `title` 和 `venue` 的值只允许中文字符、英文字母和空格。冒号 `:` 替换为空格，引号删除，其他特殊符号（`-`、`/`、`&` 等）统一替换为空格
+- `paper_type` 只允许 `system` 或 `method`

@@ -3,6 +3,12 @@
 ## 输入
 - 论文源码包路径: ${paper_path}
 - 输出根目录: ${output_dir}
+- Skill 目录: ${skill_dir}
+
+## 必读参考文件
+
+在开始处理前，必须读取以下文件：
+1. `${skill_dir}/references/appendix-stripping.md` — 附录剥离方法论（含独立附录文件判断规则、主文件 `\appendix` 截断规则、保守原则）
 
 ## 处理步骤
 
@@ -83,39 +89,76 @@ for d in figure pics figures fig images img; do
 done
 ```
 
-### 6. 列出源码文件并识别附录
+### 6. 探索目录结构并识别附录（关键步骤）
 
-arXiv 源码包中，附录通常以独立文件形式存在。列出所有 .tex 文件，由你自主判断哪些是附录：
+**不同论文的附录结构千差万别，绝不能仅凭文件名是否包含 "appendix" 来判断。必须先完整探索、理解文档组织方式、再决定如何剥离。**
+
+详细的附录剥离方法论见 `${skill_dir}/references/appendix-stripping.md`，必须读取并遵循。以下是核心流程摘要：
+
+#### 6.1 完整探索目录结构
+
+首先了解解压后的完整文件布局，不只是 `.tex` 文件：
 
 ```bash
-echo "=== 解压目录中的所有 .tex 文件 ==="
-find /tmp/arxiv_extract_$$ -name "*.tex" | sort
+echo "=== 完整目录结构（所有文件） ==="
+find /tmp/arxiv_extract_$$ -type f | sort
 echo ""
-echo "=== 目录结构 ==="
-find /tmp/arxiv_extract_$$ -maxdepth 2 -type f | sort
+echo "=== 子目录列表 ==="
+find /tmp/arxiv_extract_$$ -type d | sort
 ```
 
-查看文件列表后，你需要自主判断哪些文件是附录文件。判断依据：
-- 文件名包含 "appendix"、"supplementary"、"supp" 等关键词 → 高度疑似附录
-- 文件名不明确时，读取文件开头（前几行）内容检查：
-  - 开头有 `\section{Appendix}`、`\appendix` 等 → 确认是附录
-  - 开头是常规章节如 `\section{Introduction}` → 不是附录
-- 如果主文件中有 `\include{appendix}` 或 `\input{appendix}` 引用，对应的文件就是附录
+观察是否有独立的 appendix/supplementary 子目录、附录专属图片目录等。
 
-如果你不确定某个文件是否为附录，宁可保留（保守原则）。
+#### 6.2 找到并阅读主编排文件
 
-### 6.5 保存原文到 source/（排除附录）
+找到包含 `\documentclass` 的主 `.tex` 文件（名称可能是 main.tex、paper.tex、article.tex 或任何名称）。**完整阅读它**，重点关注：
 
-确认附录文件后，执行以下操作：
+1. **`\include{...}` 和 `\input{...}` 命令**：列出所有被引入的文件——这构成了论文的完整结构
+2. **`\appendix` 命令**：这是判断附录边界的**最可靠标志**。`\appendix` 之后的所有 `\section` 都会变成附录
+3. **文档组织方式**：论文可能是集中编排（每 section 一个文件）、内联编排（全部在主文件）、分目录编排等
 
-1. **不复制**附录文件到 `${PAPER_DIR}/source/`
-2. 复制所有非附录的 `.tex`、`.bib`、`.sty`、`.cls`、`.bst` 文件到 source/
-3. 对于主 `.tex` 文件，读取内容检查：
-   - 如果存在 `\appendix` 命令，截断其后内容（保留 `.full_backup` 备份）
-   - 如果存在 `\include{appendix}`、`\input{appendix}` 等引用，注释掉该行
-4. 如果主文件被截断，保存截断后的版本到 source/，完整版保留为 `.full_backup`
+#### 6.3 追踪 include/input 链
 
-详细的附录剥离方法论见 `${skill_dir}/references/appendix-stripping.md`。
+对于主文件中引用的每个文件，确认它属于正文还是附录：
+
+- `\appendix` 命令之后的 `\include`/`\input` → **直接排除**（100% 是附录）
+- `\appendix` 命令之后的直接内容 → **需要截断**
+- 被 include 的文件可能又 include 了其他文件（如 `appendix.tex` 中又 `\input{appendix-A}`）→ 追踪完整引用链
+
+#### 6.4 识别附录文件
+
+综合以上信息判断每个文件：
+
+| 依据 | 处理 |
+|------|------|
+| 被 `\appendix` 之后的 `\include`/`\input` 引用 | 排除 |
+| 在独立的 appendix/supp 子目录中 | 排除 |
+| 文件内容为补充材料（完整 prompt 列表、额外数据表等）| 视情况排除 |
+| 文件名含 "appendix"/"supplementary"/"supp" | 排除，但必须阅读内容确认 |
+
+**警告：不要只看文件名。** 有些附录文件叫 `experiments_details.tex`、`full_prompts.tex`，文件名中不含 "appendix"。必须通过主文件的引用位置和文件内容来判断。
+
+#### 6.5 常见附录结构
+
+务必注意以下几种常见模式：
+
+- **独立 appendix.tex + 子文件**：main.tex → `\include{appendix}`，appendix.tex → `\input{appendix-A/B/C}`
+- **主文件内联 `\appendix`**：主文件中 `\appendix` 后面的所有内容都是附录
+- **分目录组织**：正文和附录在不同子目录
+- **扁平结构无显式标记**：所有 .tex 平铺，只能通过阅读内容判断
+- **超长论文**：正文 10 页附录 50+ 页，如果附录没剥离干净，layout 分析和精读笔记会浪费大量 token
+
+#### 6.6 保存原文到 source/（排除附录）
+
+确认所有附录文件后：
+
+1. **不复制**附录相关的 `.tex` 文件到 `${PAPER_DIR}/source/`
+2. **不复制**附录图片子目录到 images/（如果存在）
+3. 复制所有非附录文件（`.tex`、`.bib`、`.sty`、`.cls`、`.bst`、`.bbl`）到 source/
+4. 对于主 `.tex` 文件：
+   - 如果存在 `\appendix` 命令，截断其后内容
+   - 如果存在 `\include{appendix}` 等引用，注释掉该行（加 `%` 前缀）
+   - 完整版保留为 `.full_backup` 备份
 
 ### 7. 保存原始压缩包
 ```bash

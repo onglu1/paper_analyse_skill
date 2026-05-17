@@ -67,18 +67,27 @@
 - 图片越多越好，但不要引入 MinerU 的公式图片
 - 禁止使用 `![](images/xxx.png)` 的 Markdown 图片语法
 
-Frontmatter 格式：
+Frontmatter 格式（**重要：必须严格遵守以下规则，否则会导致 YAML 解析报错**）：
+
 ```yaml
 ---
-title: ${paper_title}
+title: 论文标题
 year: 2026
-venue: <从论文 tex 源码或获取 agent 报告中提取；如果都没有显式标注，用 WebSearch 搜索标题确认是否被接收，查不到填 "arXiv preprint">
-paper_type: system / method
+venue: 发表来源
+paper_type: system
 tags:
   - 论文笔记
   - 精读
 ---
 ```
+
+**字段值约束（必须执行）：**
+- `title`：只允许中文字符、英文字母和空格。标题中的冒号 `:` 必须替换为空格，引号 `"` 必须删除，其他特殊符号（`-`、`/`、`&` 等）统一替换为空格。示例：`"LLM-based MAS: A Survey"` → `LLM based MAS  A Survey`
+- `venue`：同理，只允许中英文字母和空格。示例：`AAAI 2025`、`NeurIPS 2024`、`arXiv preprint`
+- `paper_type`：只允许 `system` 或 `method`。`system` = 论文主要贡献是一个系统或框架；`method` = 论文主要贡献是一个算法或方法
+- `tags`：保持数组格式，添加 `- 精读` 标签
+
+详细规范见 `note-structure.md` 第五节"Frontmatter 格式"。
 
 ### 5. 正则匹配引用，补齐 glossary 大纲
 

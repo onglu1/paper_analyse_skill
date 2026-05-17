@@ -4,6 +4,13 @@
 - PDF 文件列表: ${pdf_list}（每行一个路径）
 - 输出根目录: ${output_dir}
 - 可用 GPU: ${selected_gpus}
+- Skill 目录: ${skill_dir}
+
+## 必读参考文件
+
+在开始处理前，必须读取以下文件：
+1. `${skill_dir}/references/mineru-config.yaml` — MinerU 环境配置（cli_path、router_path、model_source、modelscope_cache）
+2. `${skill_dir}/references/appendix-stripping.md` — 附录剥离方法论（含 References 锚点法、附录判断规则、截断策略）
 
 ## 处理步骤
 

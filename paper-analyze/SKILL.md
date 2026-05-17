@@ -184,24 +184,38 @@ ${output_dir}/<safe_title>/
 
 ---
 
-## 子 Agent Prompt 索引
+## 子 Agent 启动指南
 
-启动子 Agent 前，读取对应的 Prompt 文件（位于 `${skill_dir}/prompts/`），替换占位符后传递给 Agent 工具。
+每个子 Agent 由两部分组成：
+- **Prompt 文件**（`${skill_dir}/prompts/`）：定义子 Agent 的任务、处理步骤和输入
+- **Reference 文件**（`${skill_dir}/references/`）：定义生成规范、模板骨架、写作风格等
 
-| Prompt | 文件路径 | 用途 | 触发条件 |
-|--------|----------|------|----------|
-| 0 | `${skill_dir}/prompts/00-mineru-setup.md` | MinerU 环境检查 + GPU 选择 | 有模式 B 论文时 |
-| 1 | `${skill_dir}/prompts/01-fetch-mode-a.md` | 论文获取（LaTeX 源码包） | 模式 A 论文 |
-| 2 | `${skill_dir}/prompts/02-fetch-mode-b.md` | 论文获取（PDF + MinerU） | 模式 B 单篇论文 |
-| 2a | `${skill_dir}/prompts/02a-image-layout.md` | 图片布局分析 | 论文获取完成后，精读笔记前 |
-| 3 | `${skill_dir}/prompts/03-mineru-batch.md` | MinerU 多 GPU 并行转换 | 模式 B 多篇论文 |
-| 4 | `${skill_dir}/prompts/04-deep-note.md` | 精读笔记 + glossary 生成 | 必选，最先执行 |
-| 5 | `${skill_dir}/prompts/05-simple-note.md` | 简要版笔记 | 用户选择"简要版" |
-| 6 | `${skill_dir}/prompts/06-marp-ppt.md` | Marp PPT 大纲 | 用户选择"PPT 大纲" |
-| 7 | `${skill_dir}/prompts/07-html-slides.md` | HTML 幻灯片 | 用户选择"HTML 幻灯片版" |
-| 8 | `${skill_dir}/prompts/08-html-page.md` | HTML 长页面 | 用户选择"HTML 长页面版" |
+### 启动流程
 
-占位符说明：
+1. 读取对应的 Prompt 文件（路径见下表）
+2. 读取 Prompt 文件中"必读参考文件"章节列出的 Reference 文件，将其内容嵌入到传递给子 Agent 的 prompt 中，让子 Agent 在开始工作前自行阅读
+3. 替换所有占位符（`${paper_dir}`、`${safe_title}` 等）
+4. 将处理后的完整 prompt 传递给 Agent 工具启动子 Agent
+
+**重要：启动子 Agent 时必须把 Reference 文件的内容一并传递给子 Agent。** 子 Agent 无法访问主对话的上下文，必须在 prompt 中内嵌所有需要的规范文件内容。
+
+### Prompt 与 Reference 对照表
+
+| # | 子 Agent | Prompt 文件 | 必须读取的 Reference | 触发条件 |
+|---|---------|------------|---------------------|----------|
+| 0 | MinerU 环境检查 | `prompts/00-mineru-setup.md` | `references/mineru-setup.md` | 有模式 B 论文时 |
+| 1 | 论文获取（LaTeX 源码） | `prompts/01-fetch-mode-a.md` | `references/appendix-stripping.md` | 模式 A 论文 |
+| 2 | 论文获取（PDF + MinerU） | `prompts/02-fetch-mode-b.md` | `references/mineru-config.yaml`、`references/mineru-setup.md`、`references/appendix-stripping.md` | 模式 B 单篇论文 |
+| 2a | 图片布局分析 | `prompts/02a-image-layout.md` | —（无额外 reference 依赖） | 论文获取完成后，精读笔记前 |
+| 3 | MinerU 批量转换 | `prompts/03-mineru-batch.md` | `references/mineru-config.yaml`、`references/appendix-stripping.md` | 模式 B 多篇论文 |
+| 4 | 精读笔记 | `prompts/04-deep-note.md` | `references/note-structure.md`（结构规范+概念提取流程+frontmatter 规则）、`references/note-template.md`（写作风格+图片 HTML 模板+双链规范） | 必选，最先执行 |
+| 5 | 简要版 | `prompts/05-simple-note.md` | `references/simple-template.md`（结构规范）、`references/note-template.md`（第6节：图片 HTML 模板）、`references/note-structure.md`（第5节：frontmatter 规则） | 用户选择"简要版" |
+| 6 | Marp PPT 大纲 | `prompts/06-marp-ppt.md` | `references/marp-template.md` | 用户选择"PPT 大纲" |
+| 7 | HTML 幻灯片 | `prompts/07-html-slides.md` | `references/html-slides-template.md` | 用户选择"HTML 幻灯片版" |
+| 8 | HTML 长页面 | `prompts/08-html-page.md` | `references/html-page-template.md` | 用户选择"HTML 长页面版" |
+
+### 占位符说明
+
 - `${paper_path}` — 论文文件路径（.tar.gz / .pdf / 目录）
 - `${output_dir}` — 用户指定的输出根目录
 - `${paper_title}` — 论文原始标题

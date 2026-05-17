@@ -7,7 +7,10 @@
 
 ## 必读参考文件
 
-1. `${skill_dir}/references/simple-template.md` — 简要版规范
+在开始撰写前，必须读取以下文件理解写作规范：
+1. `${skill_dir}/references/simple-template.md` — 简要版规范和 5 部分结构
+2. `${skill_dir}/references/note-template.md`（第6节：图片 HTML 模板）— 图片排版 HTML 模板（单图、并排图、多图网格）
+3. `${skill_dir}/references/note-structure.md`（第5节：Frontmatter 格式）— frontmatter 字段值约束规则
 
 ## 处理步骤
 
@@ -39,18 +42,21 @@
 - 控制在 5 分钟能讲完的篇幅
 - 术语首次出现时必须解释
 
-Frontmatter：
+Frontmatter（从精读笔记提取，遵守 `note-structure.md` 第五节约束）：
+
 ```yaml
 ---
-title: ${paper_title}
+title: 论文标题（已去除冒号、引号等特殊字符，只保留中英文字母和空格）
 year: 2026
-venue: <从精读笔记提取>
-paper_type: system / method
+venue: 发表来源（只允许中英文字母和空格）
+paper_type: system
 tags:
   - 论文笔记
   - 简要版
 ---
 ```
+
+**字段值约束：** `title` 和 `venue` 的值只允许中文字符、英文字母和空格。冒号 `:` 替换为空格，引号删除，其他特殊符号替换为空格。`paper_type` 只允许 `system` 或 `method`。
 
 ## 输出
 完成后报告：
